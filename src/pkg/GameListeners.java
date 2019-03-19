@@ -9,6 +9,7 @@ public class GameListeners extends KeyAdapter implements ActionListener, ChangeL
 
     GamePanel gamePanel;
     private Timer alienMoveTimer = new Timer(20, this);
+    private Timer mysteryShipMoveTimer = new Timer(15, this);
     private Timer shotMoveTimer = new Timer(10, this);
     private Timer alienBombMoveTimer = new Timer(20, this);
     private Timer alienBombGenerationTimer = new Timer(1000, this);
@@ -22,6 +23,7 @@ public class GameListeners extends KeyAdapter implements ActionListener, ChangeL
         shotMoveTimer.start();
         alienBombMoveTimer.start();
         alienBombGenerationTimer.start();
+        mysteryShipMoveTimer.start();
     }
 
     @Override
@@ -55,6 +57,11 @@ public class GameListeners extends KeyAdapter implements ActionListener, ChangeL
         if (e.getSource() == alienBombGenerationTimer){
             for (Alien a: gamePanel.getAliens()) {
                 gamePanel.randomBombInit();
+            }
+        }
+        if (e.getSource() == mysteryShipMoveTimer){
+            if (gamePanel.getMysteryShip().isVisible()){
+                gamePanel.moveMysteryShip();
             }
         }
 
