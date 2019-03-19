@@ -11,7 +11,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class GamePanel extends JPanel implements Constants { //TODO: Optimize, add sound
+public class GamePanel extends JPanel implements Constants { //TODO: Optimize
 
     private int alienDxDiffCompensation = 0;
     private int shotVeloDiffCompensation = 0;
