@@ -13,9 +13,18 @@ public class Alien extends Sprite {
     private int yDir;
     private int width;
     private int height;
+    private int pointValue = 0;
     private static final String alienImagePath = "src/alien.png";
 
     private BufferedImage alienImage = null;
+
+    public int getPointValue() {
+        return pointValue;
+    }
+
+    public void setPointValue(int pointValue) {
+        this.pointValue = pointValue;
+    }
 
     Alien (int x, int y){
         initializeAlien(x, y);
