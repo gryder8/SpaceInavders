@@ -18,11 +18,11 @@ public class Alien extends Sprite {
 
     private BufferedImage alienImage = null;
 
-    public int getPointValue() {
+    int getPointValue() {
         return pointValue;
     }
 
-    public void setPointValue(int pointValue) {
+    void setPointValue(int pointValue) {
         this.pointValue = pointValue;
     }
 
