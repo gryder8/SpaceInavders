@@ -11,7 +11,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class GamePanel extends JPanel implements Constants { //TODO: Optimize
+public class GamePanel extends JPanel implements Constants { //TODO: Optimize, add sound
 
     private int alienDxDiffCompensation = 0;
     private int shotVeloDiffCompensation = 0;
@@ -55,11 +55,11 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
 
     private int playerScore = 0;
 
-    public Color getCurrentPlayerColor() {
+    Color getCurrentPlayerColor() {
         return currentPlayerColor;
     }
 
-    public Color getStarColor() {
+    Color getStarColor() {
         return starColor;
     }
 
@@ -118,18 +118,23 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         switch (gridPos) { //cases = numVertical in constructor
             case 0:
                 a.setImage(changeColorOfImage(a.getImage(), PINK));
+                a.setPointValue(40);
                 break;
             case 1:
                 a.setImage(changeColorOfImage(a.getImage(), PURPLE));
+                a.setPointValue(20);
                 break;
             case 2:
                 a.setImage(changeColorOfImage(a.getImage(), Color.CYAN));
+                a.setPointValue(20);
                 break;
             case 3:
                 a.setImage(changeColorOfImage(a.getImage(), Color.GREEN));
+                a.setPointValue(10);
                 break;
             default:
                 a.setImage(changeColorOfImage(a.getImage(), Color.RED));
+                a.setPointValue(10);
                 break;
         }
 
@@ -293,7 +298,6 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         int shotY = shot.getyPos();
         int alienX = a.getxPos();
         int alienY = a.getyPos();
-
         if (playerShot.isVisible() && a.isVisible()) {
             if (shotX >= (alienX) //collision check
                     && shotX <= (alienX + ALIEN_WIDTH)
@@ -302,7 +306,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
                 a.setDying(true);
                 playerShot.setVisible(false);
                 SoundManager.invaderKilledSound();
-                playerScore += 20;
+                playerScore += a.getPointValue();
             }
         }
     }
@@ -322,13 +326,13 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         int playerY = p.getyPos();
 
         if (p.isVisible() && b.isVisible()) {
-
             if (bombX >= (playerX)
                     && bombX <= (playerX + PLAYER_WIDTH)
                     && bombY >= (playerY)
                     && bombY <= (playerY + PLAYER_HEIGHT)) {
                 SoundManager.playerDeathSound();
                 b.setVisible(false);
+                playerShot.setVisible(false);
                 playerLives--;
                 player.setxPos(50);
                 if (playerLives < 0) {
