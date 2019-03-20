@@ -7,8 +7,8 @@ import java.io.IOException;
 
 public class Player extends Sprite {
 
-    private static final String playerImagePath = "src/player.png";
-    private static final String explosionImagePath = "src/alienExpl.png";
+    private static final String playerImagePath = "src/assets/player.png";
+    private static final String explosionImagePath = "src/assets/alienExpl.png";
 
 
     private Shot playerBomb;

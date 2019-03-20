@@ -15,7 +15,7 @@ public class MysteryShip extends Sprite {
     private int width;
     private int height;
     private int pointValue = 50;
-    private static final String mysteryShipImagePath = "src/mysteryShip.png";
+    private static final String mysteryShipImagePath = "src/assets/mysteryShip.png";
 
     public int getPointValue() {
         return pointValue;
@@ -42,7 +42,7 @@ public class MysteryShip extends Sprite {
         try {
             mysteryShipImage = ImageIO.read(new File(mysteryShipImagePath));
         } catch (IOException ex){
-            System.err.println("No alien image found. Make sure the file is in the src folder");
+            System.err.println("No alien image found. Make sure the file is in the assets folder");
         }
         setImage(mysteryShipImage);
     }

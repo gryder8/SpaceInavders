@@ -11,7 +11,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class GamePanel extends JPanel implements Constants { //TODO: Optimize, add sound
+public class GamePanel extends JPanel implements Constants { //TODO: Optimize
 
     private int alienDxDiffCompensation = 0;
     private int shotVeloDiffCompensation = 0;
@@ -126,12 +126,13 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize, a
         }
     }
 
-    void initMysteryShip(){
+    private void initMysteryShip(){ //TODO: Add special sound for mystery ship init and death
         Color ORANGE = new Color(255, 105, 18);
         if (!mysteryShip.isVisible() && player.isVisible()){
             mysteryShip.setPointValue(100);
             mysteryShip.setImage(changeColorOfImage(mysteryShip.getImage(), ORANGE));
             mysteryShip.setVisible(true);
+            SoundManager.mysteryShipIntroSound();
         }
     }
 
@@ -147,7 +148,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize, a
     void randomBombInit() {
         if (aliens.size() > 0 && !isPaused) {
             for (Alien a : aliens) {
-                int roll = ThreadLocalRandom.current().nextInt(0, 4000 - shotChanceModifier); //TODO: Tweak to change shooting amount
+                int roll = ThreadLocalRandom.current().nextInt(0, 3850 - shotChanceModifier); //TODO: Tweak to change shooting amount
                 if (roll == 1) {
                     initAlienBomb(a);
                 }

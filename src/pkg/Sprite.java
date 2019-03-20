@@ -17,7 +17,7 @@ class Sprite { //all characters inherit from these general traits of a sprite
     private int yPos;
     private boolean isDying;
 
-    private final String explImagePath = "src/alienExpl.png";
+    private final String explImagePath = "src/assets/alienExpl.png";
 
     boolean isVisible() {
         return isVisible;

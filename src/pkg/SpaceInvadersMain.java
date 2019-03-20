@@ -63,6 +63,14 @@ public class SpaceInvadersMain extends JFrame implements Constants {
         //*************************************************************************
         //*************************************************************************
 
+        JMenuItem sound = new JMenu("Sound");
+        JMenuItem toggleSound = new JMenuItem("Toggle Sound");
+
+
+
+        //*************************************************************************
+        //*************************************************************************
+
         menuBar.add(file);
         menuBar.add(options);
         menuBar.add(difficulty);

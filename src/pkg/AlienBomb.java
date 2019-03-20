@@ -7,7 +7,7 @@ import java.io.IOException;
 
 class AlienBomb extends Sprite {
 
-    private static final String bombImagePath = "src/bomb.png";
+    private static final String bombImagePath = "src/assets/bomb.png";
 
     AlienBomb(int x, int y){
         bombInit(x,y);
