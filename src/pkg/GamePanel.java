@@ -6,6 +6,8 @@ import com.sun.istack.internal.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
@@ -17,24 +19,6 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
     private int shotVeloDiffCompensation = 0;
     private int bombVeloDiffCompensation = 0;
     private int shotChanceModifier = 0;
-
-
-    void setAlienDxDiffCompensation(int alienDxDiffCompensation) {
-        this.alienDxDiffCompensation = alienDxDiffCompensation;
-    }
-
-    void setShotVeloDiffCompensation(int shotVeloDiffCompensation) {
-        this.shotVeloDiffCompensation = shotVeloDiffCompensation;
-    }
-
-    void setBombVeloDiffCompensation(int bombVeloDiffCompensation) {
-        this.bombVeloDiffCompensation = bombVeloDiffCompensation;
-    }
-
-    void setShotChanceModifier(int shotChanceModifier) {
-        this.shotChanceModifier = shotChanceModifier;
-    }
-
     private Random rand = new Random();
     private ArrayList<Alien> aliens = new ArrayList<>();
     private int[][] starPositions = new int[NUM_STARS][2]; //0 is x, 1 is y
@@ -43,50 +27,18 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
     private int playerWidth;
     private int playerHeight;
     private int bottomOffset;
-    private MysteryShip mysteryShip = new MysteryShip(0 ,20);
-
+    private MysteryShip mysteryShip = new MysteryShip(0, 20);
     private Color currentPlayerColor = Color.GREEN;
-
     private Color starColor = Color.WHITE;
-    private Font font = new Font("Lucida Sans", Font.PLAIN, 20);
-
+    private File fontFile = new File("src/assets/invaders.otf");
+    private Font font;
+    /**
+     * Game States
+     */
     private boolean isPaused = false;
-
-    private int playerLives = 0;
-
+    private boolean isMuted = false;
+    private int playerLives = 2;
     private int playerScore = 0;
-
-    MysteryShip getMysteryShip() {
-        return mysteryShip;
-    }
-
-    Color getCurrentPlayerColor() {
-        return currentPlayerColor;
-    }
-
-    Color getStarColor() {
-        return starColor;
-    }
-
-    void setPaused(boolean paused) {
-        isPaused = paused;
-    }
-
-    void setStarColor(Color starColor) {
-        this.starColor = starColor;
-    }
-
-    ArrayList<Alien> getAliens() {
-        return aliens;
-    }
-
-    Player getPlayer() {
-        return player;
-    }
-
-    BufferedImage getPlayerImage() {
-        return player.getImage();
-    }
 
     GamePanel() { //constructor (does all necessary initialization)
 
@@ -95,6 +47,15 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         int numVertical = 5;
         final int H_SPACING = 120;
         final int V_SPACING = 50;
+
+        try {
+            font = Font.createFont(Font.TRUETYPE_FONT, fontFile);
+            font = font.deriveFont(30F);
+        } catch (FontFormatException e){
+            System.err.println("Font format error!");
+        } catch (IOException e){
+            System.err.println("Exception occurred while setting font!");
+        }
 
         long beginTime = System.currentTimeMillis();
 
@@ -117,8 +78,65 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         System.out.println("Setup time: " + (endTime - beginTime));
     }
 
-    private void randomMysteryShipInit (){
-        if (aliens.size() > 0 && !isPaused) {
+    void setAlienDxDiffCompensation(int alienDxDiffCompensation) {
+        this.alienDxDiffCompensation = alienDxDiffCompensation;
+    }
+
+    void setShotVeloDiffCompensation(int shotVeloDiffCompensation) {
+        this.shotVeloDiffCompensation = shotVeloDiffCompensation;
+    }
+
+    void setBombVeloDiffCompensation(int bombVeloDiffCompensation) {
+        this.bombVeloDiffCompensation = bombVeloDiffCompensation;
+    }
+
+    void setShotChanceModifier(int shotChanceModifier) {
+        this.shotChanceModifier = shotChanceModifier;
+    }
+
+    boolean isMuted() {
+        return isMuted;
+    }
+
+    void setMuted(boolean muted) {
+        isMuted = muted;
+    }
+
+    MysteryShip getMysteryShip() {
+        return mysteryShip;
+    }
+
+    Color getCurrentPlayerColor() {
+        return currentPlayerColor;
+    }
+
+    Color getStarColor() {
+        return starColor;
+    }
+
+    void setStarColor(Color starColor) {
+        this.starColor = starColor;
+    }
+
+    void setPaused(boolean paused) {
+        isPaused = paused;
+    }
+
+    ArrayList<Alien> getAliens() {
+        return aliens;
+    }
+
+    Player getPlayer() {
+        return player;
+    }
+
+    BufferedImage getPlayerImage() {
+        return player.getImage();
+    }
+
+
+    private void randomMysteryShipInit() {
+        if (aliens.size() > 0 && !isPaused && !mysteryShip.isVisible()) {
             int roll = ThreadLocalRandom.current().nextInt(0, 100); //use 100
             if (roll < 10) {
                 initMysteryShip();
@@ -126,20 +144,26 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         }
     }
 
-    private void initMysteryShip(){ //TODO: Add special sound for mystery ship init and death
-        Color ORANGE = new Color(255, 105, 18);
-        if (!mysteryShip.isVisible() && player.isVisible()){
+    private void initMysteryShip() {
+        int R = ThreadLocalRandom.current().nextInt(10, 255);
+        int G = ThreadLocalRandom.current().nextInt(10, 255);
+        int B = ThreadLocalRandom.current().nextInt(10, 255);
+        Color RANDOM = new Color(R, G, B);
+        if (!mysteryShip.isVisible() && player.isVisible()) {
             mysteryShip.setPointValue(100);
-            mysteryShip.setImage(changeColorOfImage(mysteryShip.getImage(), ORANGE));
+            mysteryShip.setxPos(1);
+            mysteryShip.setImage(changeColorOfImage(mysteryShip.getImage(), RANDOM));
             mysteryShip.setVisible(true);
-            SoundManager.mysteryShipIntroSound();
+            if (!isMuted) {
+                SoundManager.mysteryShipIntroSound();
+            }
         }
     }
 
-    void moveMysteryShip(){
-        if (mysteryShip.isVisible() && mysteryShip.getxPos() < BOARD_WIDTH && mysteryShip.getxPos() >= 0){
-            mysteryShip.move(3+alienDxDiffCompensation);
-        } else{
+    void moveMysteryShip() {
+        if (mysteryShip.isVisible() && mysteryShip.getxPos() < BOARD_WIDTH && mysteryShip.getxPos() >= 0) { //is between the bounds and is visible
+            mysteryShip.move(3 + alienDxDiffCompensation);
+        } else {
             mysteryShip.setVisible(false);
         }
     }
@@ -254,11 +278,11 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         }
     }
 
-    private void drawMysteryShip(Graphics g){
-        if (mysteryShip.isVisible()){
+    private void drawMysteryShip(Graphics g) {
+        if (mysteryShip.isVisible()) {
             g.drawImage(mysteryShip.getImage(), mysteryShip.getxPos(), mysteryShip.getyPos(), this);
         }
-        if (mysteryShip.isDying()){
+        if (mysteryShip.isDying()) {
             mysteryShip.setVisible(false);
             repaint();
         }
@@ -282,7 +306,9 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
             playerShot = new Shot(player.getxPos(), player.getyPos());
             playerShot.setVisible(true);
             repaint();
-            SoundManager.shootSound();
+            if (!isMuted) {
+                SoundManager.shootSound();
+            }
         }
     }
 
@@ -359,20 +385,24 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
                     && shotY <= (alienY + ALIEN_HEIGHT)) {
                 a.setDying(true);
                 playerShot.setVisible(false);
-                SoundManager.invaderKilledSound();
+                if (!isMuted) {
+                    SoundManager.invaderKilledSound();
+                }
                 playerScore += a.getPointValue();
                 randomMysteryShipInit();
             }
         }
 
-        if (playerShot.isVisible() && mysteryShip.isVisible()){
+        if (playerShot.isVisible() && mysteryShip.isVisible()) {
             if (shotX >= (mShipX) //collision check
                     && shotX <= (mShipX + MSHIP_WIDTH)
                     && shotY >= (mShipY)
                     && shotY <= (mShipY + MSHIP_HEIGHT)) {
                 mysteryShip.setDying(true);
                 playerShot.setVisible(false);
-                SoundManager.invaderKilledSound();
+                if (!isMuted) {
+                    SoundManager.invaderKilledSound();
+                }
                 playerScore += mysteryShip.getPointValue();
             }
         }
@@ -397,7 +427,9 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
                     && bombX <= (playerX + PLAYER_WIDTH)
                     && bombY >= (playerY)
                     && bombY <= (playerY + PLAYER_HEIGHT)) {
-                SoundManager.playerDeathSound();
+                if (!isMuted) {
+                    SoundManager.playerDeathSound();
+                }
                 b.setVisible(false);
                 playerShot.setVisible(false);
                 playerLives--;
@@ -411,8 +443,6 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
             }
         }
     }
-
-
 
 
     void moveAliens() { //moves the aliens (called every 20 ms by timer in GameListeners)
@@ -535,15 +565,14 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         super.paintComponent(g);
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
-
         g.setFont(font);
         g.setColor(Color.RED);
-        g.drawString("Lives Remaining: " + playerLives, 0, font.getSize()); //String, x, y
+        g.drawString("Lives Remaining: " + playerLives, 5, font.getSize()); //String, x, y
 
         g.setColor(Color.GREEN);
 
         String scoreDisplay = "Score: " + playerScore;
-        g.drawString(scoreDisplay, BOARD_WIDTH - (scoreDisplay.length() * 11), font.getSize()); //String, x, y
+        g.drawString(scoreDisplay, BOARD_WIDTH - (scoreDisplay.length() * 10), font.getSize()); //String, x, y
 
         drawAliens(g);
         drawMysteryShip(g);

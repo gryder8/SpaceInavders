@@ -38,7 +38,7 @@ public class SpaceInvadersMain extends JFrame implements Constants {
         //*************************************************************************
         //*************************************************************************
 
-        JMenuItem difficulty  = new JMenu("Difficulty");
+        JMenuItem difficulty = new JMenu("Difficulty");
 
         JMenuItem diff1 = new JMenuItem("1");
         diff1.addActionListener(listener);
@@ -63,9 +63,10 @@ public class SpaceInvadersMain extends JFrame implements Constants {
         //*************************************************************************
         //*************************************************************************
 
-        JMenuItem sound = new JMenu("Sound");
+        JMenuItem soundOptions = new JMenu("Sound");
         JMenuItem toggleSound = new JMenuItem("Toggle Sound");
-
+        toggleSound.addActionListener(listener);
+        soundOptions.add(toggleSound);
 
 
         //*************************************************************************
@@ -74,6 +75,7 @@ public class SpaceInvadersMain extends JFrame implements Constants {
         menuBar.add(file);
         menuBar.add(options);
         menuBar.add(difficulty);
+        menuBar.add(soundOptions);
 
         window.setJMenuBar(menuBar);
 
