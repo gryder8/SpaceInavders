@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class Shot extends Sprite {
-    private final String shotImagePath = "src/shot.png";
+    private final String shotImagePath = "src/assets/shot.png";
 
 //    private final int HORIZ_SPACE = 12;
 //    private final int VERT_SPACE = 10;

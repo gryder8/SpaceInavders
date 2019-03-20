@@ -14,7 +14,7 @@ public class Alien extends Sprite {
     private int width;
     private int height;
     private int pointValue = 0;
-    private static final String alienImagePath = "src/alien.png";
+    private static final String alienImagePath = "src/assets/alien.png";
 
     private BufferedImage alienImage = null;
 
@@ -59,7 +59,7 @@ public class Alien extends Sprite {
         try {
             alienImage = ImageIO.read(new File(alienImagePath));
         } catch (IOException ex){
-            System.err.println("No alien image found. Make sure the file is in the src folder");
+            System.err.println("No alien image found. Make sure the file is in the assets folder");
         }
         setImage(alienImage);
     }
