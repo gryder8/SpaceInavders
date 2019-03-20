@@ -10,7 +10,7 @@ public interface Constants {
     int NUM_STARS = 200;
     int BOARD_WIDTH = screenSize.width;
     int BOARD_HEIGHT = screenSize.height;
-    int SHOT_VELOCITY = -12;
-    int BOMB_VELOCITY = +6;
+    int SHOT_VELOCITY = -13;
+    int BOMB_VELOCITY = +7;
 
 }
