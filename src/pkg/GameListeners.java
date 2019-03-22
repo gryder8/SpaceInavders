@@ -110,7 +110,7 @@ public class GameListeners extends KeyAdapter implements ActionListener {
             case "insane":
                 gamePanel.setBombVeloDiffCompensation(6);
                 gamePanel.setAlienDxDiffCompensation(10);
-                gamePanel.setShotChanceModifier(3500);
+                gamePanel.setShotChanceModifier(4000);
                 gamePanel.setShotVeloDiffCompensation(8);
                 break;
         }
