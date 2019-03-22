@@ -30,30 +30,33 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
     private MysteryShip mysteryShip = new MysteryShip(0, 20);
     private Color currentPlayerColor = Color.GREEN;
     private Color starColor = Color.WHITE;
-    private File fontFile = new File("src/assets/invaders.otf");
+    private int aliensKilled = 0;
+
     private Font font;
     /**
      * Game States
      */
     private boolean isPaused = false;
     private boolean isMuted = false;
-    private int playerLives = 2;
+    private int playerLives = 0;
     private int playerScore = 0;
 
     GamePanel() { //constructor (does all necessary initialization)
 
+        File fontFile = new File("src/assets/invaders.otf"); //file for font
+
         bottomOffset = 200;
         int numHorizontal = 10;
         int numVertical = 5;
-        final int H_SPACING = 120;
+        final int H_SPACING = 85;
         final int V_SPACING = 50;
 
         try {
             font = Font.createFont(Font.TRUETYPE_FONT, fontFile);
             font = font.deriveFont(30F);
-        } catch (FontFormatException e){
+        } catch (FontFormatException e) {
             System.err.println("Font format error!");
-        } catch (IOException e){
+        } catch (IOException e) {
             System.err.println("Exception occurred while setting font!");
         }
 
@@ -135,7 +138,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
     }
 
 
-    private void randomMysteryShipInit() {
+    private void randomMysteryShipInit() { //use a random number to possibly init the ship
         if (aliens.size() > 0 && !isPaused && !mysteryShip.isVisible()) {
             int roll = ThreadLocalRandom.current().nextInt(0, 100); //use 100
             if (roll < 10) {
@@ -144,7 +147,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         }
     }
 
-    private void initMysteryShip() {
+    private void initMysteryShip() { //create the mystery ship with a random color and make it worth 100 points
         int R = ThreadLocalRandom.current().nextInt(10, 255);
         int G = ThreadLocalRandom.current().nextInt(10, 255);
         int B = ThreadLocalRandom.current().nextInt(10, 255);
@@ -162,34 +165,36 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
 
     void moveMysteryShip() {
         if (mysteryShip.isVisible() && mysteryShip.getxPos() < BOARD_WIDTH && mysteryShip.getxPos() >= 0) { //is between the bounds and is visible
-            mysteryShip.move(3 + alienDxDiffCompensation);
+            mysteryShip.move(4);
+
         } else {
             mysteryShip.setVisible(false);
         }
     }
 
 
-    void randomBombInit() {
+    void randomBombInit() { //use a random number to possibly init the bomb
         if (aliens.size() > 0 && !isPaused) {
             for (Alien a : aliens) {
-                int roll = ThreadLocalRandom.current().nextInt(0, 3850 - shotChanceModifier); //TODO: Tweak to change shooting amount
-                if (roll == 1) {
+                int roll = ThreadLocalRandom.current().nextInt(0, 6000 - shotChanceModifier); //Tweak these to change shooting amount
+                if (roll <= aliensKilled/2) {
                     initAlienBomb(a);
                 }
             }
         }
     }
 
-    private void initAlienBomb(Alien a) {
+    private void initAlienBomb(Alien a) { //init a bomb belonging to a certain alien object a
         if (!a.getBomb().isVisible() && a.isVisible() && player.isVisible()) {
             a.setBomb(new AlienBomb(a.getxPos(), a.getyPos()));
             a.getBomb().setVisible(true);
         }
     }
 
-    private void alienColorInit(int gridPos, Alien a) { //color the rows of aliens
+    private void alienColorInit(int gridPos, Alien a) { //color the rows of aliens and set their point values accordingly
         final Color PURPLE = new Color(95, 20, 255); //use for purple
         final Color PINK = new Color(255, 102, 204); //more vibrant than Color.PINK
+
         switch (gridPos) { //cases = numVertical in constructor
             case 0:
                 a.setImage(changeColorOfImage(a.getImage(), PINK));
@@ -251,24 +256,27 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
     }
 
     @SuppressWarnings("Duplicates")
-    private void drawPlayer(Graphics g) {
+    private void drawPlayer(Graphics g) { //draw the player at it's position if it's visible
         if (player.isVisible()) {
             g.drawImage(player.getImage(), player.getxPos(), player.getyPos(), this);
         } else if (player.isDying()) {
             setPaused(true);
-            JTextArea text = new JTextArea("Game over! You died! Score: " + playerScore);
-            JOptionPane.showMessageDialog(this, text);
+//            JTextArea text = new JTextArea("Game over! You died!\nScore: " + playerScore); //TODO: Change font in window?
+//            text.setFont(new Font("Lucida Sans", Font.PLAIN, 14));
+//            text.setLineWrap(true);
+            String msg = "Game over! You died! Score: " + playerScore;
+            JOptionPane.showMessageDialog(this, msg);
             System.exit(0);
         }
     }
 
-    private void drawShot(Graphics g) {
+    private void drawShot(Graphics g) { //draw the shot under certain conditions if it's visible
         if (playerShot.isVisible() && playerShot != null) {
             g.drawImage(playerShot.getImage(), playerShot.getxPos(), playerShot.getyPos(), this);
         }
     }
 
-    private void drawAlienBombs(Graphics g) {
+    private void drawAlienBombs(Graphics g) { //draw all the bombs on the screen iteratively
         for (Alien a : aliens) {
             if (a.getBomb().isVisible()) {
                 g.drawImage(a.getBomb().getImage(), a.getBomb().getxPos(), a.getBomb().getyPos(), this);
@@ -278,7 +286,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         }
     }
 
-    private void drawMysteryShip(Graphics g) {
+    private void drawMysteryShip(Graphics g) { //draw the ship at its postion if its visible and initialized
         if (mysteryShip.isVisible()) {
             g.drawImage(mysteryShip.getImage(), mysteryShip.getxPos(), mysteryShip.getyPos(), this);
         }
@@ -288,11 +296,11 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         }
     }
 
-    boolean isPlayerShotVisible() {
+    boolean isPlayerShotVisible() { //getter
         return playerShot.isVisible();
     }
 
-    void moveShot() {
+    void moveShot() { //move the shot if it's visible
         if (playerShot.getyPos() > 0) {
             playerShot.move(SHOT_VELOCITY + shotVeloDiffCompensation);
             repaint();
@@ -301,7 +309,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         }
     }
 
-    void initPlayerShot() {
+    void initPlayerShot() { //initialize the player shot object if certain conditions are met
         if (!playerShot.isVisible() && !isPaused) {
             playerShot = new Shot(player.getxPos(), player.getyPos());
             playerShot.setVisible(true);
@@ -324,7 +332,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         }
     }
 
-    private Alien topAlien() {
+    private Alien topAlien() { //find the top-most alien in the grid of aliens
         Alien topAlien = aliens.get(0);
         for (Alien a : aliens) {
             if (a.getyPos() < topAlien.getyPos()) {
@@ -334,7 +342,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         return topAlien;
     }
 
-    private Alien bottomAlien() {
+    private Alien bottomAlien() { //find the bottom alien in the grid of aliens
         Alien bottomAlien = aliens.get(0);
         for (Alien a : aliens) {
             if (a.getyPos() >= bottomAlien.getyPos()) {
@@ -345,7 +353,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
     }
 
     @SuppressWarnings("Duplicates")
-    private Alien leftAlien() {
+    private Alien leftAlien() { //finds the left-most alien in the grid of aliens
         Alien leftAlien = aliens.get(0);
         for (Alien a : aliens) {
             if (a.getxPos() < leftAlien.getxPos()) {
@@ -356,7 +364,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
     }
 
     @SuppressWarnings("Duplicates")
-    private Alien rightAlien() {
+    private Alien rightAlien() { //finds the right-most alien in the grid of aliens
         Alien rightAlien = aliens.get(0);
         for (Alien a : aliens) {
             if (a.getxPos() > rightAlien.getxPos()) {
@@ -366,7 +374,11 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         return rightAlien;
     }
 
-    private void checkShotCollision(Alien a, Shot shot) {
+    /**
+     * @param a:    alien object to check for collisions with (iterate)
+     * @param shot: shot object to check for collisions with
+     */
+    private void checkShotCollision(@NotNull Alien a, @NotNull Shot shot) {
         a.setDying(false);
         final int ALIEN_WIDTH = a.getWidth();
         final int ALIEN_HEIGHT = a.getHeight();
@@ -389,6 +401,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
                     SoundManager.invaderKilledSound();
                 }
                 playerScore += a.getPointValue();
+                aliensKilled++;
                 randomMysteryShipInit();
             }
         }
@@ -409,8 +422,8 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
     }
 
     /**
-     * @param p player object to check for collisions with
-     * @param b bomb object to check for collisions with (iterate through on call)
+     * @param p: player object to check for collisions with
+     * @param b: bomb object to check for collisions with (iterate through on call)
      */
     private void checkAlienBombCollision(@NotNull Player p, @NotNull AlienBomb b) {
 
@@ -431,9 +444,11 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
                     SoundManager.playerDeathSound();
                 }
                 b.setVisible(false);
+                player.setVisible(false);
                 playerShot.setVisible(false);
                 playerLives--;
                 player.setxPos(50);
+                player.setVisible(true);
                 if (playerLives < 0) {
                     playerLives = 0;
                     delay(800);
@@ -449,8 +464,8 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         if (aliens.size() > 0 && player.isVisible() && !isPaused) {
             int dx = ((int) Math.ceil((double) 10 / aliens.size())) * 2 + alienDxDiffCompensation;
 
-            if (aliens.size() == 1) {
-                dx = 15 + alienDxDiffCompensation;
+            if (aliens.size() == 1) { //make last alien super fast
+                dx = 18 + alienDxDiffCompensation;
             }
 
             int dy = 0;
@@ -475,27 +490,27 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
 
             if (rightEdgeAlien.getxPos() > BOARD_WIDTH - rightAlienWidth) { //WIDTH = 1680
                 isMovingRight = false;
-                dy = rightEdgeAlien.getHeight() / 3;
+                dy = rightEdgeAlien.getHeight() / 3; //change divisor to make it move down less
             }
 
 
             if (leftEdgeAlien.getxPos() < 0) {
                 isMovingRight = true;
-                dy = leftEdgeAlien.getHeight() / 3;
+                dy = leftEdgeAlien.getHeight() / 3; //change divisor to make it move down less
             }
 
 
-            for (Alien a : aliens) {
+            for (Alien a : aliens) { //iterate through
 
                 if (isMovingRight) {
                     a.setxDir(+1);
-                } else if (!isMovingRight) {
+                } else if (!isMovingRight) { //condition is not always true (ignore)
                     a.setxDir(-1);
                 }
 
                 if (isMovingDown) {
                     a.setyDir(+1);
-                } else if (!isMovingDown) {
+                } else if (!isMovingDown) { //condition is not always true (ignore)
                     a.setyDir(-1);
                 }
                 a.move(dx, dy);
@@ -509,11 +524,11 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         }
     }
 
-    private void removeDeadAliens() {
-        Iterator<Alien> itr = aliens.iterator();
+    private void removeDeadAliens() { //use an iterator to avoid a concurrent modification exception
+        Iterator<Alien> itr = aliens.iterator(); //iterator is an Alien object moving through aliens array
         while (itr.hasNext()) {
             if (!itr.next().isVisible()) {
-                itr.remove();
+                itr.remove(); //removes it from the array
             }
         }
     }
