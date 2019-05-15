@@ -11,10 +11,11 @@ public class GameListeners extends KeyAdapter implements ActionListener {
     private GamePanel gamePanel;
     /**
      * Timers to run movement (send action events at specified interval)
+     * May push CPU quite hard
      */
-    private Timer alienMoveTimer = new Timer(20, this);
-    private Timer mysteryShipMoveTimer = new Timer(15, this);
-    private Timer shotMoveTimer = new Timer(10, this);
+    private Timer alienMoveTimer = new Timer(12, this);
+    private Timer mysteryShipMoveTimer = new Timer(25, this);
+    private Timer shotMoveTimer = new Timer(20, this);
     private Timer alienBombMoveTimer = new Timer(20, this);
     private Timer alienBombGenerationTimer = new Timer(1000, this);
 
@@ -33,7 +34,7 @@ public class GameListeners extends KeyAdapter implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String s = " ";
+        String s = "";
         if (e.getActionCommand() != null) {
             s = e.getActionCommand();
         }
@@ -120,10 +121,10 @@ public class GameListeners extends KeyAdapter implements ActionListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
-        if (code == KeyEvent.VK_LEFT) {
+        if (code == KeyEvent.VK_LEFT || code == KeyEvent.VK_A) {
             gamePanel.movePlayer(-12);
         }
-        if (code == KeyEvent.VK_RIGHT) {
+        if (code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_D) {
             gamePanel.movePlayer(+12);
         }
         if (code == KeyEvent.VK_UP || code == KeyEvent.VK_SPACE) {
