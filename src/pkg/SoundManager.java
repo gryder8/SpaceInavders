@@ -61,6 +61,7 @@ class SoundManager {
         }
     }
 
+    //@SuppressWarnings("Duplicates")
     static void mysteryShipIntroSound(){
         try {
             audioIn = AudioSystem.getAudioInputStream(mysteryShipIntro);

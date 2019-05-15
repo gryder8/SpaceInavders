@@ -1,19 +1,16 @@
 package pkg;
 
 
-import com.sun.istack.internal.NotNull;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class GamePanel extends JPanel implements Constants { //TODO: Optimize
+public class GamePanel extends JPanel implements Constants { //TODO: Optimize?
 
     private int alienDxDiffCompensation = 0;
     private int shotVeloDiffCompensation = 0;
@@ -21,6 +18,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
     private int shotChanceModifier = 0;
     private Random rand = new Random();
     private ArrayList<Alien> aliens = new ArrayList<>();
+    private ArrayList<Blocker> blockers = new ArrayList<>();
     private int[][] starPositions = new int[NUM_STARS][2]; //0 is x, 1 is y
     private Player player;
     private Shot playerShot = new Shot();
@@ -38,11 +36,11 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
      */
     private boolean isPaused = false;
     private boolean isMuted = false;
-    private int playerLives = 0;
+    private int playerLives = 2;
     private int playerScore = 0;
 
     GamePanel() { //constructor (does all necessary initialization)
-
+        long beginTime = System.currentTimeMillis();
         File fontFile = new File("src/assets/invaders.otf"); //file for font
 
         bottomOffset = 200;
@@ -60,16 +58,18 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
             System.err.println("Exception occurred while setting font!");
         }
 
-        long beginTime = System.currentTimeMillis();
+        for (int j = 0; j < NUM_BLOCKERS; j++){
+            blockers.add(new Blocker(((BOARD_WIDTH/NUM_BLOCKERS)*j)+100, BOARD_HEIGHT-300, 5));
+        }
 
         for (int i = 0; i < numHorizontal; i++) {
             for (int j = 0; j < numVertical; j++) {
                 aliens.add(j, new Alien((i * H_SPACING) + 300, (j * V_SPACING) + 50));
-                alienColorInit(j, aliens.get(j));
+                alienColorAndPointInit(j, aliens.get(j));
             }
         }
 
-        long endTime = System.currentTimeMillis();
+
 
         player = new Player(BOARD_WIDTH / 2, BOARD_HEIGHT - bottomOffset); //init
         playerWidth = player.getImage().getWidth(this);
@@ -78,7 +78,8 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         playerShot.setVisible(false);
         mysteryShip.setVisible(false);
         repaint();
-        System.out.println("Setup time: " + (endTime - beginTime));
+        long endTime = System.currentTimeMillis();
+        System.out.println("Setup time: " + (endTime - beginTime) + " ms");
     }
 
     void setAlienDxDiffCompensation(int alienDxDiffCompensation) {
@@ -176,8 +177,8 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
     void randomBombInit() { //use a random number to possibly init the bomb
         if (aliens.size() > 0 && !isPaused) {
             for (Alien a : aliens) {
-                int roll = ThreadLocalRandom.current().nextInt(0, 6000 - shotChanceModifier); //Tweak these to change shooting amount
-                if (roll <= aliensKilled/2) {
+                int roll = ThreadLocalRandom.current().nextInt(0, 7000 - shotChanceModifier); //Tweak these to change shooting amount
+                if (roll <= aliensKilled / 2) {
                     initAlienBomb(a);
                 }
             }
@@ -191,7 +192,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         }
     }
 
-    private void alienColorInit(int gridPos, Alien a) { //color the rows of aliens and set their point values accordingly
+    private void alienColorAndPointInit(int gridPos, Alien a) { //color the rows of aliens and set their point values accordingly
         final Color PURPLE = new Color(95, 20, 255); //use for purple
         final Color PINK = new Color(255, 102, 204); //more vibrant than Color.PINK
 
@@ -240,7 +241,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         }
     }
 
-    @SuppressWarnings("Duplicates")
+
     private void drawAliens(Graphics g) { //iterate  through the array of aliens and draw them at their current positions with current images
         removeDeadAliens();
         for (Alien a : aliens) {
@@ -255,7 +256,8 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         }
     }
 
-    @SuppressWarnings("Duplicates")
+
+
     private void drawPlayer(Graphics g) { //draw the player at it's position if it's visible
         if (player.isVisible()) {
             g.drawImage(player.getImage(), player.getxPos(), player.getyPos(), this);
@@ -296,6 +298,17 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         }
     }
 
+    private void drawBlockers(Graphics g){
+        for (Blocker b: blockers){
+            if (b.isDying()){
+                b.setVisible(false); //TODO: Animate?
+                repaint();
+            } else if (b.isVisible()){
+                g.drawImage(b.getImage(), b.getxPos(), b.getyPos(), this);
+            }
+        }
+    }
+
     boolean isPlayerShotVisible() { //getter
         return playerShot.isVisible();
     }
@@ -303,6 +316,10 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
     void moveShot() { //move the shot if it's visible
         if (playerShot.getyPos() > 0) {
             playerShot.move(SHOT_VELOCITY + shotVeloDiffCompensation);
+            if (playerShot.getyPos() > (BOARD_HEIGHT/2) - 200)
+                for (Blocker b : blockers) {
+                    checkShotCollisionWithBlocker(playerShot,b);
+                }
             repaint();
         } else {
             playerShot.setVisible(false);
@@ -329,6 +346,11 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
                 a.getBomb().setVisible(false);
             }
             checkAlienBombCollision(player, a.getBomb());
+            if (a.getBomb().getyPos() > BOARD_HEIGHT/2 + 100){
+                for (Blocker b: blockers){
+                    checkBlockerCollisionWithBomb(b, a.getBomb());
+                }
+            }
         }
     }
 
@@ -352,7 +374,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         return bottomAlien;
     }
 
-    @SuppressWarnings("Duplicates")
+
     private Alien leftAlien() { //finds the left-most alien in the grid of aliens
         Alien leftAlien = aliens.get(0);
         for (Alien a : aliens) {
@@ -363,7 +385,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         return leftAlien;
     }
 
-    @SuppressWarnings("Duplicates")
+
     private Alien rightAlien() { //finds the right-most alien in the grid of aliens
         Alien rightAlien = aliens.get(0);
         for (Alien a : aliens) {
@@ -378,7 +400,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
      * @param a:    alien object to check for collisions with (iterate)
      * @param shot: shot object to check for collisions with
      */
-    private void checkShotCollision(@NotNull Alien a, @NotNull Shot shot) {
+    private void checkShotCollision(Alien a, Shot shot) {
         a.setDying(false);
         final int ALIEN_WIDTH = a.getWidth();
         final int ALIEN_HEIGHT = a.getHeight();
@@ -422,10 +444,55 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
     }
 
     /**
+     * @param b: blocker object to check for collisions with
+     * @param ab: bomb object to check for collisions with (iterate through on call)
+     */
+    private void checkBlockerCollisionWithBomb (Blocker b, AlienBomb ab){
+        final int BLOCKER_HEIGHT = b.getImage().getHeight();
+        final int BLOCKER_WIDTH = b.getImage().getWidth();
+
+        int bombX = ab.getxPos();
+        int bombY = ab.getyPos();
+        int blockerX = b.getxPos();
+        int blockerY = b.getyPos();
+
+        if (b.isVisible() && ab.isVisible()){
+            if (bombX >= (blockerX)
+                    && bombX <= (blockerX + BLOCKER_WIDTH)
+                    && bombY >= (blockerY)
+                    && bombY <= (blockerY + BLOCKER_HEIGHT)){
+                //TODO: add sound FX here
+                ab.setVisible(false);
+                b.setHealth(b.getHealth()-1);
+            }
+        }
+    }
+
+    private void checkShotCollisionWithBlocker (Shot shot, Blocker b){
+        final int BLOCKER_HEIGHT = b.getImage().getHeight();
+        final int BLOCKER_WIDTH = b.getImage().getWidth();
+        int blockerX = b.getxPos();
+        int blockerY = b.getyPos();
+
+        int shotX = shot.getxPos();
+        int shotY = shot.getyPos();
+
+        if (b.isVisible() && shot.isVisible()){
+            if (shotX >= (blockerX)
+                    && shotX <= (blockerX + BLOCKER_WIDTH)
+                    && shotY >= (blockerY)
+                    && shotY <= (blockerY + BLOCKER_HEIGHT)){
+                //TODO: add sound FX here
+                shot.setVisible(false);
+            }
+        }
+    }
+
+    /**
      * @param p: player object to check for collisions with
      * @param b: bomb object to check for collisions with (iterate through on call)
      */
-    private void checkAlienBombCollision(@NotNull Player p, @NotNull AlienBomb b) {
+    private void checkAlienBombCollision(Player p, AlienBomb b) {
 
         final int PLAYER_HEIGHT = p.getHeight();
         final int PLAYER_WIDTH = p.getWidth();
@@ -525,12 +592,9 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
     }
 
     private void removeDeadAliens() { //use an iterator to avoid a concurrent modification exception
-        Iterator<Alien> itr = aliens.iterator(); //iterator is an Alien object moving through aliens array
-        while (itr.hasNext()) {
-            if (!itr.next().isVisible()) {
-                itr.remove(); //removes it from the array
-            }
-        }
+        //iterator is an Alien object moving through aliens array
+        //removes it from the array
+        aliens.removeIf(alien -> !alien.isVisible());
     }
 
     void movePlayer(int dx) { //dx is passed in GameListeners
@@ -588,7 +652,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
 
         String scoreDisplay = "Score: " + playerScore;
         g.drawString(scoreDisplay, BOARD_WIDTH - (scoreDisplay.length() * 10), font.getSize()); //String, x, y
-
+        drawBlockers(g);
         drawAliens(g);
         drawMysteryShip(g);
         drawStars(g, starColor);
@@ -599,6 +663,4 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize
         drawAlienBombs(g);
 
     }
-
-
 }

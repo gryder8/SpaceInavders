@@ -12,7 +12,7 @@ class Sprite { //all characters inherit from these general traits of a sprite
     private Timer deathAnimationTimer;
 
     private boolean isVisible;
-    private BufferedImage image; //image of sprite (change color?)
+    private BufferedImage image; //image of sprites
     private int xPos;
     private int yPos;
     private boolean isDying;
@@ -32,7 +32,7 @@ class Sprite { //all characters inherit from these general traits of a sprite
         try {
             image = ImageIO.read(new File(explImagePath));
         } catch (IOException ex) {
-            System.err.println("No explosion image found. Make sure the file is in the src folder");
+            System.err.println("No explosion image found. Make sure the file is in the assets folder");
             return;
         }
         setImage(image);
