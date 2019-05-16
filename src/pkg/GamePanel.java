@@ -29,6 +29,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize?
     private Color currentPlayerColor = Color.GREEN;
     private Color starColor = Color.WHITE;
     private int aliensKilled = 0;
+    private int scoreModifier = 1;
 
     private Font font;
     /**
@@ -138,6 +139,13 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize?
         return player.getImage();
     }
 
+    public int getScoreModifier() {
+        return scoreModifier;
+    }
+
+    public void setScoreModifier(int scoreModifier) {
+        this.scoreModifier = scoreModifier;
+    }
 
     private void randomMysteryShipInit() { //use a random number to possibly init the ship
         if (aliens.size() > 0 && !isPaused && !mysteryShip.isVisible()) {
@@ -177,8 +185,8 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize?
     void randomBombInit() { //use a random number to possibly init the bomb
         if (aliens.size() > 0 && !isPaused) {
             for (Alien a : aliens) {
-                int roll = ThreadLocalRandom.current().nextInt(0, 7000 - shotChanceModifier); //Tweak these to change shooting amount
-                if (roll <= aliensKilled / 2) {
+                int roll = ThreadLocalRandom.current().nextInt(0, 8000 - shotChanceModifier); //Tweak these to change shooting amount
+                if (roll <= aliensKilled / 2) { //aliens will fire more shots as you kill more of them
                     initAlienBomb(a);
                 }
             }
@@ -422,7 +430,7 @@ public class GamePanel extends JPanel implements Constants { //TODO: Optimize?
                 if (!isMuted) {
                     SoundManager.invaderKilledSound();
                 }
-                playerScore += a.getPointValue();
+                playerScore += a.getPointValue() * scoreModifier;
                 aliensKilled++;
                 randomMysteryShipInit();
             }
