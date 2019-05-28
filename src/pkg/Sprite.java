@@ -9,7 +9,7 @@ import java.util.TimerTask;
 
 class Sprite { //all characters inherit from these general traits of a sprite
 
-    private Timer deathAnimationTimer;
+
 
     private boolean isVisible;
     private BufferedImage image; //image of sprites
@@ -36,7 +36,7 @@ class Sprite { //all characters inherit from these general traits of a sprite
             return;
         }
         setImage(image);
-        deathAnimationTimer = new Timer();
+        Timer deathAnimationTimer = new Timer();
         deathAnimationTimer.schedule(alienDeathAnimation, 300);
         //isVisible = false;
     }

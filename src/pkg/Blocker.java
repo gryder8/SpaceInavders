@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class Blocker extends Sprite implements Constants {
+public class Blocker extends Sprite {
 
     private int health;
     private int maxHealth;
@@ -27,11 +27,11 @@ public class Blocker extends Sprite implements Constants {
     }
 
 
-    public int getHealth() {
+    int getHealth() {
         return health;
     }
 
-    public void setHealth(int health) {
+    void setHealth(int health) {
         if (health <= 0){
             this.setDying(true);
             return;
@@ -54,6 +54,6 @@ public class Blocker extends Sprite implements Constants {
             System.err.println("No image found. Make sure the file is in the assets folder");
             return;
         }
-        super.setImage(image);
+        super.setImage(image); //code to the super type
     }
 }
