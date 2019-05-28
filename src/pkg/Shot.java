@@ -14,11 +14,11 @@ public class Shot extends Sprite {
     private BufferedImage shotImage = null; //init
 
 
-    public Shot(){
+    Shot(){
         this.setVisible(false);
     }
 
-    public Shot (int x, int y){
+    Shot (int x, int y){
         shotInit(x,y);
     }
 

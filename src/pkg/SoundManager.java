@@ -13,7 +13,8 @@ class SoundManager {
     private static Clip clip;
     private static AudioInputStream audioIn;
 
-    @SuppressWarnings("Duplicates")
+    //Code is duplicated, but writing a helper method to simply handle a file and play it causes too much sound lag
+
     static void shootSound() {
         try {
             audioIn = AudioSystem.getAudioInputStream(shoot);
@@ -29,7 +30,6 @@ class SoundManager {
         }
     }
 
-    @SuppressWarnings("Duplicates")
     static void invaderKilledSound (){
         try {
             audioIn = AudioSystem.getAudioInputStream(invaderKilled);
@@ -45,7 +45,6 @@ class SoundManager {
         }
     }
 
-    @SuppressWarnings("Duplicates")
     static void playerDeathSound(){
         try {
             audioIn = AudioSystem.getAudioInputStream(playerDeath);
@@ -61,7 +60,7 @@ class SoundManager {
         }
     }
 
-    //@SuppressWarnings("Duplicates")
+
     static void mysteryShipIntroSound(){
         try {
             audioIn = AudioSystem.getAudioInputStream(mysteryShipIntro);
@@ -76,7 +75,5 @@ class SoundManager {
             System.err.println("No line available for the current audio clip");
         }
     }
-
-
 
 }

@@ -55,13 +55,13 @@ public class Alien extends Sprite {
         this.setxPos(x);
         this.setyPos(y);
 
-        bomb = new AlienBomb(x,y); //use same position as alien?
+        bomb = new AlienBomb(x,y);
         try {
             alienImage = ImageIO.read(new File(alienImagePath));
         } catch (IOException ex){
             System.err.println("No alien image found. Make sure the file is in the assets folder");
         }
-        setImage(alienImage);
+        super.setImage(alienImage);
     }
 
     int getWidth(){
@@ -76,14 +76,14 @@ public class Alien extends Sprite {
         return bomb;
     }
 
-    public void setBomb(AlienBomb bomb) {
+    void setBomb(AlienBomb bomb) {
         this.bomb = bomb;
     }
 
 
     void move (int xDirection, int yDirection){
-        setxPos(getxPos()+xDirection*xDir);
-        setyPos(getyPos()+yDirection*yDir);
+        this.setxPos(getxPos()+(xDirection*xDir));
+        this.setyPos(getyPos()+(yDirection*yDir));
     }
 
 

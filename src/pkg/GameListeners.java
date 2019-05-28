@@ -13,7 +13,7 @@ public class GameListeners extends KeyAdapter implements ActionListener {
      * Timers to run movement (send action events at specified interval)
      * May push CPU quite hard
      */
-    private Timer alienMoveTimer = new Timer(12, this);
+    private Timer alienMoveTimer = new Timer(10, this);
     private Timer mysteryShipMoveTimer = new Timer(25, this);
     private Timer shotMoveTimer = new Timer(20, this);
     private Timer alienBombMoveTimer = new Timer(20, this);
@@ -129,7 +129,7 @@ public class GameListeners extends KeyAdapter implements ActionListener {
         if (code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_D) {
             gamePanel.movePlayer(+12);
         }
-        if (code == KeyEvent.VK_UP || code == KeyEvent.VK_SPACE) {
+        if (code == KeyEvent.VK_UP || code == KeyEvent.VK_SPACE || code == KeyEvent.VK_W) {
             gamePanel.initPlayerShot();
         }
     }
