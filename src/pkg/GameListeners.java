@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class GameListeners extends KeyAdapter implements ActionListener {
 
@@ -18,6 +20,8 @@ public class GameListeners extends KeyAdapter implements ActionListener {
     private Timer shotMoveTimer = new Timer(20, this);
     private Timer alienBombMoveTimer = new Timer(20, this);
     private Timer alienBombGenerationTimer = new Timer(1000, this);
+
+    private Set<Integer> pressedKeys = new TreeSet<>();
 
     GameListeners(GamePanel panel) {
         this.gamePanel = panel;
@@ -51,7 +55,6 @@ public class GameListeners extends KeyAdapter implements ActionListener {
             for (Alien a : gamePanel.getAliens()) {
                 if (a.getBomb().isVisible()) {
                     gamePanel.moveAlienBomb(a);
-                    gamePanel.repaint();
                 }
             }
         }
@@ -68,6 +71,9 @@ public class GameListeners extends KeyAdapter implements ActionListener {
 
         //handle externals
         switch (s.toLowerCase()) {
+            case "pause (p)":
+                gamePanel.setPaused(!gamePanel.isPaused());
+                break;
             case "change player color":
                 gamePanel.setPaused(true);
                 gamePanel.getPlayer().setImage(gamePanel.changeColorOfImage(gamePanel.getPlayerImage(), gamePanel.customColor(gamePanel.getCurrentPlayerColor())));
@@ -89,18 +95,21 @@ public class GameListeners extends KeyAdapter implements ActionListener {
                 gamePanel.setAlienDxDiffCompensation(0);
                 gamePanel.setShotChanceModifier(0);
                 gamePanel.setShotVeloDiffCompensation(0);
+                gamePanel.setDiffRangeIncrease(0);
                 break;
             case "2":
                 gamePanel.setBombVeloDiffCompensation(1);
                 gamePanel.setAlienDxDiffCompensation(3);
                 gamePanel.setShotChanceModifier(500);
                 gamePanel.setShotVeloDiffCompensation(3);
+                gamePanel.setDiffRangeIncrease(0);
                 break;
             case "3":
                 gamePanel.setBombVeloDiffCompensation(4);
                 gamePanel.setAlienDxDiffCompensation(5);
                 gamePanel.setShotChanceModifier(800);
                 gamePanel.setShotVeloDiffCompensation(5);
+                gamePanel.setDiffRangeIncrease(0);
                 break;
             case "4":
                 gamePanel.setBombVeloDiffCompensation(5);
@@ -108,6 +117,7 @@ public class GameListeners extends KeyAdapter implements ActionListener {
                 gamePanel.setShotChanceModifier(2200);
                 gamePanel.setShotVeloDiffCompensation(6);
                 gamePanel.setScoreModifier(2);
+                gamePanel.setDiffRangeIncrease(8);
                 break;
             case "insane":
                 gamePanel.setBombVeloDiffCompensation(6);
@@ -115,6 +125,7 @@ public class GameListeners extends KeyAdapter implements ActionListener {
                 gamePanel.setShotChanceModifier(4000);
                 gamePanel.setShotVeloDiffCompensation(8);
                 gamePanel.setScoreModifier(3);
+                gamePanel.setDiffRangeIncrease(15);
                 break;
         }
     }
@@ -123,14 +134,33 @@ public class GameListeners extends KeyAdapter implements ActionListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
-        if (code == KeyEvent.VK_LEFT || code == KeyEvent.VK_A) {
-            gamePanel.movePlayer(-12);
+        Integer val = code;
+
+        if (!pressedKeys.contains(val)) {
+            if (code == KeyEvent.VK_P) {
+                gamePanel.setPaused(!gamePanel.isPaused());
+                pressedKeys.add(code);
+            }
         }
-        if (code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_D) {
-            gamePanel.movePlayer(+12);
+
+        if (!gamePanel.isPaused()) {
+            if (code == KeyEvent.VK_LEFT || code == KeyEvent.VK_A) {
+                gamePanel.movePlayer(-12);
+            }
+            if (code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_D) {
+                gamePanel.movePlayer(+12);
+            }
+            if (code == KeyEvent.VK_UP || code == KeyEvent.VK_SPACE || code == KeyEvent.VK_W) {
+                gamePanel.initPlayerShot();
+            }
         }
-        if (code == KeyEvent.VK_UP || code == KeyEvent.VK_SPACE || code == KeyEvent.VK_W) {
-            gamePanel.initPlayerShot();
+
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e){
+        if (e.getKeyCode() == KeyEvent.VK_P) {
+            pressedKeys.remove(e.getKeyCode());
         }
     }
 

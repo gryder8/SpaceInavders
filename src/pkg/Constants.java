@@ -13,7 +13,7 @@ public interface Constants {
     int SHOT_VELOCITY = -16;
     int BOMB_VELOCITY = +7;
     int NUM_BLOCKERS = 6;
-    int BASE_SHOT_MODIFIER = 8600;
+    int BASE_SHOT_MODIFIER = 9250;
     int BLOCKER_HEALTH = 5;
 
 }
