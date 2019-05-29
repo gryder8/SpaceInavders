@@ -29,7 +29,9 @@ public class GamePanel extends JPanel implements Constants {
     private Color currentPlayerColor = Color.GREEN;
     private Color starColor = Color.WHITE;
     private int aliensKilled = 0;
+
     private int scoreModifier = 1;
+    private int diffRangeIncrease = 0;
 
     private Font font;
     /**
@@ -59,8 +61,8 @@ public class GamePanel extends JPanel implements Constants {
             System.err.println("Exception occurred while setting font!");
         }
 
-        for (int j = 0; j < NUM_BLOCKERS; j++){
-            blockers.add(new Blocker(((BOARD_WIDTH/NUM_BLOCKERS)*j)+100, BOARD_HEIGHT-300, BLOCKER_HEALTH));
+        for (int j = 0; j < NUM_BLOCKERS; j++) {
+            blockers.add(new Blocker(((BOARD_WIDTH / NUM_BLOCKERS) * j) + 100, BOARD_HEIGHT - 300, BLOCKER_HEALTH));
         }
 
         for (int i = 0; i < numHorizontal; i++) {
@@ -80,6 +82,14 @@ public class GamePanel extends JPanel implements Constants {
         repaint();
         long endTime = System.currentTimeMillis();
         System.out.println("Setup time: " + (endTime - beginTime) + " ms");
+    }
+
+    static void delay(long ms) { //for testing use
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            System.err.println("Exception!");
+        }
     }
 
     void setAlienDxDiffCompensation(int alienDxDiffCompensation) {
@@ -124,6 +134,18 @@ public class GamePanel extends JPanel implements Constants {
 
     void setPaused(boolean paused) {
         isPaused = paused;
+    }
+
+    public boolean isPaused() {
+        return isPaused;
+    }
+
+    public int getDiffRangeIncrease() {
+        return diffRangeIncrease;
+    }
+
+    public void setDiffRangeIncrease(int diffRangeIncrease) {
+        this.diffRangeIncrease = diffRangeIncrease;
     }
 
     ArrayList<Alien> getAliens() {
@@ -180,12 +202,11 @@ public class GamePanel extends JPanel implements Constants {
         }
     }
 
-
     void randomBombInit() { //use a random number to possibly init the bomb
         if (aliens.size() > 0 && !isPaused) {
             for (Alien a : aliens) {
                 int roll = ThreadLocalRandom.current().nextInt(0, BASE_SHOT_MODIFIER - shotChanceModifier); //Tweak these to change shooting amount
-                if (roll <= aliensKilled / 2) { //aliens will fire more shots as you kill more of them
+                if (roll <= (aliensKilled / 2) + diffRangeIncrease ) { //aliens will fire more shots as you kill more of them
                     initAlienBomb(a);
                 }
             }
@@ -248,7 +269,6 @@ public class GamePanel extends JPanel implements Constants {
         }
     }
 
-
     private void drawAliens(Graphics g) { //iterate  through the array of aliens and draw them at their current positions with current images
         removeDeadObjects();
         for (Alien a : aliens) {
@@ -257,13 +277,10 @@ public class GamePanel extends JPanel implements Constants {
             }
             if (a.isDying()) {
                 a.die();
-                //repaint();
             }
             checkShotCollision(a, playerShot);
         }
     }
-
-
 
     private void drawPlayer(Graphics g) { //draw the player at it's position if it's visible
         if (player.isVisible()) {
@@ -301,11 +318,11 @@ public class GamePanel extends JPanel implements Constants {
         }
     }
 
-    private void drawBlockers(Graphics g){
-        for (Blocker b: blockers){
-            if (b.isDying()){
+    private void drawBlockers(Graphics g) {
+        for (Blocker b : blockers) {
+            if (b.isDying()) {
                 b.setVisible(false);
-            } else if (b.isVisible()){
+            } else if (b.isVisible()) {
                 g.drawImage(b.getImage(), b.getxPos(), b.getyPos(), this);
             }
         }
@@ -318,9 +335,9 @@ public class GamePanel extends JPanel implements Constants {
     void moveShot() { //move the shot if it's visible
         if (playerShot.getyPos() > 0) {
             playerShot.move(SHOT_VELOCITY + shotVeloDiffCompensation);
-            if (playerShot.getyPos() > (BOARD_HEIGHT/2) - 200)
+            if (playerShot.getyPos() > (BOARD_HEIGHT / 2) - 200)
                 for (Blocker b : blockers) {
-                    checkShotCollisionWithBlocker(playerShot,b);
+                    checkShotCollisionWithBlocker(playerShot, b);
                 }
         } else {
             playerShot.setVisible(false);
@@ -345,8 +362,8 @@ public class GamePanel extends JPanel implements Constants {
                 a.getBomb().setVisible(false);
             }
             checkAlienBombCollision(player, a.getBomb());
-            if (a.getBomb().getyPos() > BOARD_HEIGHT/2 + 100){
-                for (Blocker b: blockers){
+            if (a.getBomb().getyPos() > BOARD_HEIGHT / 2 + 100) {
+                for (Blocker b : blockers) {
                     checkBlockerCollisionWithBomb(b, a.getBomb());
                 }
             }
@@ -373,7 +390,6 @@ public class GamePanel extends JPanel implements Constants {
         return bottomAlien;
     }
 
-
     private Alien leftAlien() { //finds the left-most alien in the grid of aliens
         Alien leftAlien = aliens.get(0);
         for (Alien a : aliens) {
@@ -383,7 +399,6 @@ public class GamePanel extends JPanel implements Constants {
         }
         return leftAlien;
     }
-
 
     private Alien rightAlien() { //finds the right-most alien in the grid of aliens
         Alien rightAlien = aliens.get(0);
@@ -443,10 +458,10 @@ public class GamePanel extends JPanel implements Constants {
     }
 
     /**
-     * @param b: blocker object to check for collisions with
+     * @param b:  blocker object to check for collisions with
      * @param ab: bomb object to check for collisions with (iterate through on call)
      */
-    private void checkBlockerCollisionWithBomb (Blocker b, AlienBomb ab){
+    private void checkBlockerCollisionWithBomb(Blocker b, AlienBomb ab) {
         final int BLOCKER_HEIGHT = b.getImage().getHeight();
         final int BLOCKER_WIDTH = b.getImage().getWidth();
 
@@ -455,18 +470,18 @@ public class GamePanel extends JPanel implements Constants {
         int blockerX = b.getxPos();
         int blockerY = b.getyPos();
 
-        if (b.isVisible() && ab.isVisible()){
+        if (b.isVisible() && ab.isVisible()) {
             if (bombX >= (blockerX)
                     && bombX <= (blockerX + BLOCKER_WIDTH)
                     && bombY >= (blockerY)
-                    && bombY <= (blockerY + BLOCKER_HEIGHT)){
+                    && bombY <= (blockerY + BLOCKER_HEIGHT)) {
                 ab.setVisible(false);
-                b.setHealth(b.getHealth()-1);
+                b.setHealth(b.getHealth() - 1);
             }
         }
     }
 
-    private void checkShotCollisionWithBlocker (Shot shot, Blocker b){
+    private void checkShotCollisionWithBlocker(Shot shot, Blocker b) {
         final int BLOCKER_HEIGHT = b.getImage().getHeight();
         final int BLOCKER_WIDTH = b.getImage().getWidth();
         int blockerX = b.getxPos();
@@ -475,11 +490,11 @@ public class GamePanel extends JPanel implements Constants {
         int shotX = shot.getxPos();
         int shotY = shot.getyPos();
 
-        if (b.isVisible() && shot.isVisible()){
+        if (b.isVisible() && shot.isVisible()) {
             if (shotX >= (blockerX)
                     && shotX <= (blockerX + BLOCKER_WIDTH)
                     && shotY >= (blockerY)
-                    && shotY <= (blockerY + BLOCKER_HEIGHT)){
+                    && shotY <= (blockerY + BLOCKER_HEIGHT)) {
                 shot.setVisible(false);
             }
         }
@@ -523,10 +538,9 @@ public class GamePanel extends JPanel implements Constants {
         }
     }
 
-
     void moveAliens() { //moves the aliens (called by timer in GameListeners)
         if (aliens.size() > 0 && player.isVisible() && !isPaused) {
-            int dx = (((int)Math.ceil((double) 50 / aliens.size())) * 2) + alienDxDiffCompensation;
+            int dx = (((int) Math.ceil((double) 10 / aliens.size())) * 2) + alienDxDiffCompensation;
             //System.out.println(dx);
             //System.out.println(aliens.size());
 
@@ -606,14 +620,6 @@ public class GamePanel extends JPanel implements Constants {
         }
 
         //repaint();
-    }
-
-    static void delay(long ms) { //for testing use
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            System.err.println("Exception!");
-        }
     }
 
     BufferedImage changeColorOfImage(BufferedImage img, Color color) {

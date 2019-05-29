@@ -26,12 +26,16 @@ public class SpaceInvadersMain extends JFrame implements Constants {
 
         JMenu options = new JMenu("Options");
 
+        JMenuItem pause = new JMenuItem("Pause (P)");
+        pause.addActionListener(listener);
+
         JMenuItem chooseColor = new JMenuItem("Change Player Color");
         chooseColor.addActionListener(listener);
 
         JMenuItem chooseStarColor = new JMenuItem("Change Star Color");
         chooseStarColor.addActionListener(listener);
 
+        options.add(pause);
         options.add(chooseColor);
         options.add(chooseStarColor);
 
