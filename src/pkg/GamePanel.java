@@ -529,10 +529,12 @@ public class GamePanel extends JPanel implements Constants {
                 player.setxPos(50);
                 player.setVisible(true);
                 if (playerLives < 0) {
-                    playerLives = 0;
-                    delay(800);
+                    isPaused = true;
                     player.setVisible(false);
                     player.setDying(true);
+                    String msg = "Game over! You died! Score: " + playerScore;
+                    JOptionPane.showMessageDialog(this, msg);
+                    System.exit(0);
                 }
             }
         }

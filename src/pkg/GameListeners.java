@@ -15,7 +15,7 @@ public class GameListeners extends KeyAdapter implements ActionListener {
      * Timers to run movement (send action events at specified interval)
      * May push CPU quite hard
      */
-    private Timer alienMoveTimer = new Timer(10, this);
+    private Timer alienMoveTimer = new Timer(15, this);
     private Timer mysteryShipMoveTimer = new Timer(25, this);
     private Timer shotMoveTimer = new Timer(20, this);
     private Timer alienBombMoveTimer = new Timer(20, this);
@@ -42,30 +42,31 @@ public class GameListeners extends KeyAdapter implements ActionListener {
         if (e.getActionCommand() != null) {
             s = e.getActionCommand();
         }
-
-        if (e.getSource() == alienMoveTimer) {
-            gamePanel.moveAliens();
-        }
-        if (e.getSource() == shotMoveTimer) {
-            if (gamePanel.isPlayerShotVisible()) {
-                gamePanel.moveShot();
+        if (!gamePanel.isPaused()) {
+            if (e.getSource() == alienMoveTimer) {
+                gamePanel.moveAliens();
             }
-        }
-        if (e.getSource() == alienBombMoveTimer) {
-            for (Alien a : gamePanel.getAliens()) {
-                if (a.getBomb().isVisible()) {
-                    gamePanel.moveAlienBomb(a);
+            if (e.getSource() == shotMoveTimer) {
+                if (gamePanel.isPlayerShotVisible()) {
+                    gamePanel.moveShot();
                 }
             }
-        }
-        if (e.getSource() == alienBombGenerationTimer) {
-            for (Alien a : gamePanel.getAliens()) {
-                gamePanel.randomBombInit();
+            if (e.getSource() == alienBombMoveTimer) {
+                for (Alien a : gamePanel.getAliens()) {
+                    if (a.getBomb().isVisible()) {
+                        gamePanel.moveAlienBomb(a);
+                    }
+                }
             }
-        }
-        if (e.getSource() == mysteryShipMoveTimer) {
-            if (gamePanel.getMysteryShip().isVisible()) {
-                gamePanel.moveMysteryShip();
+            if (e.getSource() == alienBombGenerationTimer) {
+                for (Alien a : gamePanel.getAliens()) {
+                    gamePanel.randomBombInit();
+                }
+            }
+            if (e.getSource() == mysteryShipMoveTimer) {
+                if (gamePanel.getMysteryShip().isVisible()) {
+                    gamePanel.moveMysteryShip();
+                }
             }
         }
 
@@ -144,13 +145,13 @@ public class GameListeners extends KeyAdapter implements ActionListener {
         }
 
         if (!gamePanel.isPaused()) {
-            if (code == KeyEvent.VK_LEFT || code == KeyEvent.VK_A) {
+            if (code == KeyEvent.VK_LEFT) {
                 gamePanel.movePlayer(-12);
             }
-            if (code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_D) {
+            if (code == KeyEvent.VK_RIGHT) {
                 gamePanel.movePlayer(+12);
             }
-            if (code == KeyEvent.VK_UP || code == KeyEvent.VK_SPACE || code == KeyEvent.VK_W) {
+            if (code == KeyEvent.VK_UP || code == KeyEvent.VK_SPACE) {
                 gamePanel.initPlayerShot();
             }
         }
