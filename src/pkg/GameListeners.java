@@ -109,7 +109,7 @@ public class GameListeners extends KeyAdapter implements ActionListener {
                 gamePanel.setAlienDxDiffCompensation(5);
                 gamePanel.setShotChanceModifier(800);
                 gamePanel.setShotVeloDiffCompensation(5);
-                gamePanel.setDiffRangeIncrease(0);
+                gamePanel.setDiffRangeIncrease(2);
                 break;
             case "4":
                 gamePanel.setBombVeloDiffCompensation(5);
