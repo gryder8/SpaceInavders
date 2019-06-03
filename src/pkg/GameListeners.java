@@ -13,12 +13,12 @@ public class GameListeners extends KeyAdapter implements ActionListener {
     private GamePanel gamePanel;
     /**
      * Timers to run movement (send action events at specified interval)
-     * May push CPU quite hard
+     * May push CPU hard
      */
-    private Timer alienMoveTimer = new Timer(15, this);
-    private Timer mysteryShipMoveTimer = new Timer(25, this);
-    private Timer shotMoveTimer = new Timer(20, this);
-    private Timer alienBombMoveTimer = new Timer(20, this);
+    private Timer mainTimer = new Timer(17, this); //around 60 FPS
+//    private Timer mysteryShipMoveTimer = new Timer(25, this);
+//    private Timer shotMoveTimer = new Timer(20, this);
+//    private Timer alienBombMoveTimer = new Timer(20, this);
     private Timer alienBombGenerationTimer = new Timer(1000, this);
 
     private Set<Integer> pressedKeys = new TreeSet<>();
@@ -28,11 +28,11 @@ public class GameListeners extends KeyAdapter implements ActionListener {
 
         panel.addKeyListener(this);
 
-        alienMoveTimer.start(); //start movement
-        shotMoveTimer.start();
-        alienBombMoveTimer.start();
+        mainTimer.start(); //start movement
+        //shotMoveTimer.start();
+        //alienBombMoveTimer.start();
         alienBombGenerationTimer.start();
-        mysteryShipMoveTimer.start();
+        //mysteryShipMoveTimer.start();
     }
 
 
@@ -43,31 +43,45 @@ public class GameListeners extends KeyAdapter implements ActionListener {
             s = e.getActionCommand();
         }
         if (!gamePanel.isPaused()) {
-            if (e.getSource() == alienMoveTimer) {
+            if (e.getSource() == mainTimer) {
                 gamePanel.moveAliens();
-            }
-            if (e.getSource() == shotMoveTimer) {
-                if (gamePanel.isPlayerShotVisible()) {
-                    gamePanel.moveShot();
-                }
-            }
-            if (e.getSource() == alienBombMoveTimer) {
+
+                gamePanel.moveShot();
+
                 for (Alien a : gamePanel.getAliens()) {
                     if (a.getBomb().isVisible()) {
                         gamePanel.moveAlienBomb(a);
                     }
                 }
+
+                if (gamePanel.getMysteryShip().isVisible()) {
+                    gamePanel.moveMysteryShip();
+                }
+
+
             }
+//            if (e.getSource() == shotMoveTimer) {
+//                if (gamePanel.isPlayerShotVisible()) {
+//                    gamePanel.moveShot();
+//                }
+//            }
+//            if (e.getSource() == alienBombMoveTimer) {
+//                for (Alien a : gamePanel.getAliens()) {
+//                    if (a.getBomb().isVisible()) {
+//                        gamePanel.moveAlienBomb(a);
+//                    }
+//                }
+//            }
             if (e.getSource() == alienBombGenerationTimer) {
                 for (Alien a : gamePanel.getAliens()) {
                     gamePanel.randomBombInit();
                 }
             }
-            if (e.getSource() == mysteryShipMoveTimer) {
-                if (gamePanel.getMysteryShip().isVisible()) {
-                    gamePanel.moveMysteryShip();
-                }
-            }
+//            if (e.getSource() == mysteryShipMoveTimer) {
+//                if (gamePanel.getMysteryShip().isVisible()) {
+//                    gamePanel.moveMysteryShip();
+//                }
+//            }
         }
 
         //handle externals
@@ -101,8 +115,8 @@ public class GameListeners extends KeyAdapter implements ActionListener {
             case "2":
                 gamePanel.setBombVeloDiffCompensation(1);
                 gamePanel.setAlienDxDiffCompensation(3);
-                gamePanel.setShotChanceModifier(500);
-                gamePanel.setShotVeloDiffCompensation(3);
+                gamePanel.setShotChanceModifier(750);
+                gamePanel.setShotVeloDiffCompensation(2);
                 gamePanel.setDiffRangeIncrease(0);
                 break;
             case "3":
@@ -110,7 +124,7 @@ public class GameListeners extends KeyAdapter implements ActionListener {
                 gamePanel.setAlienDxDiffCompensation(5);
                 gamePanel.setShotChanceModifier(800);
                 gamePanel.setShotVeloDiffCompensation(5);
-                gamePanel.setDiffRangeIncrease(2);
+                gamePanel.setDiffRangeIncrease(3);
                 break;
             case "4":
                 gamePanel.setBombVeloDiffCompensation(5);
@@ -118,15 +132,15 @@ public class GameListeners extends KeyAdapter implements ActionListener {
                 gamePanel.setShotChanceModifier(2200);
                 gamePanel.setShotVeloDiffCompensation(6);
                 gamePanel.setScoreModifier(2);
-                gamePanel.setDiffRangeIncrease(8);
+                gamePanel.setDiffRangeIncrease(12);
                 break;
             case "insane":
                 gamePanel.setBombVeloDiffCompensation(6);
                 gamePanel.setAlienDxDiffCompensation(10);
-                gamePanel.setShotChanceModifier(4000);
+                gamePanel.setShotChanceModifier(4250);
                 gamePanel.setShotVeloDiffCompensation(8);
                 gamePanel.setScoreModifier(3);
-                gamePanel.setDiffRangeIncrease(15);
+                gamePanel.setDiffRangeIncrease(20);
                 break;
         }
     }

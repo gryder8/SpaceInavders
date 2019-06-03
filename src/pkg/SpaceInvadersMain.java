@@ -94,5 +94,8 @@ public class SpaceInvadersMain extends JFrame implements Constants {
         //*************************************************************************
 
         gamePanel.requestFocusInWindow();
+        gamePanel.setPaused(true);
+        JOptionPane.showMessageDialog(window, BEGIN_MSG);
+        gamePanel.setPaused(false);
     }
 }
