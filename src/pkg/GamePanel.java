@@ -12,10 +12,17 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class GamePanel extends JPanel implements Constants {
 
+    /**
+     * Game settings
+     */
     private int alienDxDiffCompensation;
     private int shotVeloDiffCompensation = 0;
     private int bombVeloDiffCompensation = 0;
     private int shotChanceModifier = 0;
+
+    /**
+     * Game objects and variables
+     */
     private Random rand = new Random();
     private ArrayList<Alien> aliens = new ArrayList<>();
     private ArrayList<Blocker> blockers = new ArrayList<>();
@@ -29,11 +36,14 @@ public class GamePanel extends JPanel implements Constants {
     private Color currentPlayerColor = Color.GREEN;
     private Color starColor = Color.WHITE;
     private int aliensKilled = 0;
+    private Font font;
 
+    /**
+     * Modified by GameListeners
+     */
     private int scoreModifier = 1;
     private int diffRangeIncrease = 0;
 
-    private Font font;
     /**
      * Game States
      */
@@ -195,17 +205,16 @@ public class GamePanel extends JPanel implements Constants {
 
     void moveMysteryShip() {
         if (mysteryShip.isVisible() && mysteryShip.getxPos() < BOARD_WIDTH && mysteryShip.getxPos() >= 0) { //is between the bounds and is visible
-            mysteryShip.move(4);
+            mysteryShip.move(+3);
 
-        } else {
-            mysteryShip.setVisible(false);
         }
     }
 
     void randomBombInit() { //use a random number to possibly init the bomb
         if (aliens.size() > 0 && !isPaused) {
             for (Alien a : aliens) {
-                int roll = ThreadLocalRandom.current().nextInt(0, BASE_SHOT_MODIFIER - shotChanceModifier); //Tweak these to change shooting amount
+                int roll = (int)(Math.random()*(BASE_SHOT_MODIFIER - shotChanceModifier));
+                //int roll = ThreadLocalRandom.current().nextInt(0, BASE_SHOT_MODIFIER - shotChanceModifier); //Tweak these to change shooting amount
                 if (roll <= (aliensKilled / 2) + diffRangeIncrease ) { //aliens will fire more shots as you kill more of them
                     initAlienBomb(a);
                 }
@@ -222,9 +231,9 @@ public class GamePanel extends JPanel implements Constants {
 
     private void alienColorAndPointInit(int gridPos, Alien a) { //color the rows of aliens and set their point values accordingly
         final Color PURPLE = new Color(95, 20, 255); //use for purple
-        final Color PINK = new Color(255, 102, 204); //more vibrant than Color.PINK
+        final Color PINK = new Color(235, 107, 187); //more vibrant than Color.PINK
 
-        switch (gridPos) { //cases = numVertical in constructor
+        switch (gridPos) { //gridPos = numVertical in constructor
             case 0:
                 a.setImage(changeColorOfImage(a.getImage(), PINK));
                 a.setPointValue(50);
@@ -315,6 +324,7 @@ public class GamePanel extends JPanel implements Constants {
         }
         if (mysteryShip.isDying()) {
             mysteryShip.setVisible(false);
+            mysteryShip.setDying(false);
         }
     }
 
